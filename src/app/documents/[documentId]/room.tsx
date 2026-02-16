@@ -7,18 +7,18 @@ import {
 } from "@liveblocks/react/suspense";
 import { ReactNode } from "react";
 import { useParams } from "next/navigation";
+import { FullscreenLoader } from "@/components/fullscreen-loader";
 
 export function Room({ children }: { children: ReactNode }) {
   const params = useParams();
 
   return (
     <LiveblocksProvider
-      publicApiKey={
-        "pk_dev_ATwmGfQBIA0ZKj_l2a6DpxKzXj0jFhKdwk97AczfKNSPz4KGNpS6EVtFjMQBUrLh"
-      }
+      throttle={16}
+      authEndpoint="/api/liveblocks-auth"
     >
       <RoomProvider id={params.documentId as string}>
-        <ClientSideSuspense fallback={<div>Loading…</div>}>
+        <ClientSideSuspense fallback={<FullscreenLoader label="Room loading..."/>}>
           {children}
         </ClientSideSuspense>
       </RoomProvider>
