@@ -661,7 +661,7 @@ export const Toolbar = () => {
       ))}
       <TextColorButton />
       <HighlightColorButton />
-      <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+      <Separator orientation="vertical" className="w-px h-6 bg-neutral-300" />
       <LinkButton />
       <ImageButton />
       <AlignButton />
