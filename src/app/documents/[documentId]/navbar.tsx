@@ -282,7 +282,7 @@ export const Navbar = ({ data }: NavbarProps) => {
                   </MenubarSub>
                   <MenubarItem
                     onClick={() =>
-                      editor?.chain().focus().unsetAllMarks().run()
+                      editor?.chain().focus().unsetAllMarks().clearNodes().run()
                     }
                   >
                     <RemoveFormattingIcon className="size-4 mr-2" />

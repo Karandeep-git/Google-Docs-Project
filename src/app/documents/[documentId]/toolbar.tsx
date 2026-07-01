@@ -53,17 +53,48 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+const FONT_SIZE_BY_HEADING_LEVEL: Record<number, string> = {
+  0: "11",
+  1: "20",
+  2: "16",
+  3: "14",
+  4: "12",
+  5: "11",
+  6: "11",
+};
+
+const getSelectionFontSize = (editor: ReturnType<typeof useEditorStore.getState>["editor"]) => {
+  const markedFontSize = editor?.getAttributes("textStyle").fontSize;
+
+  if (markedFontSize) {
+    return markedFontSize.replace("px", "").replace("pt", "");
+  }
+
+  for (let level = 1; level <= 6; level++) {
+    if (editor?.isActive("heading", { level })) {
+      return FONT_SIZE_BY_HEADING_LEVEL[level];
+    }
+  }
+
+  return FONT_SIZE_BY_HEADING_LEVEL[0];
+};
+
 
 const LineHeightButton = () => {
   const { editor } = useEditorStore();
 
   const lineHeights = [
-    { label: "Default", value: "normal" },
+    { label: "Default", value: "1.15" },
     { label: "Single", value: "1" },
     { label: "1.15", value: "1.15" },
     { label: "1.5", value: "1.5" },
     { label: "Double", value: "2" },
   ];
+
+  const currentLineHeight =
+    editor?.getAttributes("heading").lineHeight ||
+    editor?.getAttributes("paragraph").lineHeight ||
+    "1.15";
 
   return (
     <DropdownMenu>
@@ -79,7 +110,7 @@ const LineHeightButton = () => {
             onClick={() => editor?.chain().focus().setLineHeight(value).run()}
             className={cn(
               "flex items-center gap-x-2 px-2 rounded-sm hover:bg-neutral-200/80",
-              editor?.getAttributes("paragraph").lineHeight === value && "bg-neutral-200/80",
+              currentLineHeight === value && "bg-neutral-200/80",
             )}
           >
             <span className="text-sm">{label}</span>
@@ -93,9 +124,7 @@ const LineHeightButton = () => {
 const FontSizeButton = () => {
   const { editor } = useEditorStore();
 
-  const currentFontSize = editor?.getAttributes("textStyle").fontSize
-    ? editor?.getAttributes("textStyle").fontSize.replace("px", "")
-    : "16";
+  const currentFontSize = getSelectionFontSize(editor);
 
   const [fontSize, setFontSize] = useState(currentFontSize);
   const [inputValue, setInputValue] = useState(fontSize);
@@ -104,7 +133,7 @@ const FontSizeButton = () => {
   const updateFontSize = (newSize: string) => {
     const size = parseInt(newSize);
     if (!isNaN(size) && size > 0) {
-      editor?.chain().focus().setFontSize(`${size}px`).run();
+      editor?.chain().focus().setFontSize(`${size}pt`).run();
       setFontSize(newSize);
       setInputValue(newSize);
       setIsEditing(false);
@@ -185,7 +214,7 @@ const ListButton = () => {
     {
       label: "Bullet List",
       icon: ListIcon,
-      isActive: () => editor?.isActive("bulletLists"),
+      isActive: () => editor?.isActive("bulletList"),
       onClick: () => editor?.chain().focus().toggleBulletList().run(),
     },
     {
@@ -441,16 +470,17 @@ const HeadingLevelButton = () => {
   const { editor } = useEditorStore();
 
   const headings = [
-    { label: "Normal text", value: 0, fontSize: "16px" },
-    { label: "Heading 1", value: 1, fontSize: "32px" },
-    { label: "Heading 2", value: 2, fontSize: "24px" },
-    { label: "Heading 3", value: 3, fontSize: "20px" },
-    { label: "Heading 4", value: 4, fontSize: "18px" },
-    { label: "Heading 5", value: 5, fontSize: "16px" },
+    { label: "Normal text", value: 0, fontSize: "11pt" },
+    { label: "Heading 1", value: 1, fontSize: "20pt" },
+    { label: "Heading 2", value: 2, fontSize: "16pt" },
+    { label: "Heading 3", value: 3, fontSize: "14pt" },
+    { label: "Heading 4", value: 4, fontSize: "12pt" },
+    { label: "Heading 5", value: 5, fontSize: "11pt" },
+    { label: "Heading 6", value: 6, fontSize: "11pt" },
   ];
 
   const getCurrentHeading = () => {
-    for (let level = 1; level <= 5; level++) {
+    for (let level = 1; level <= 6; level++) {
       if (editor?.isActive("heading", { level })) {
         return `Heading ${level}`;
       }
@@ -567,8 +597,6 @@ const ToolbarButton = ({
 export const Toolbar = () => {
   const { editor } = useEditorStore();
 
-  console.log("Toolbar editor: ", { editor });
-
   const sections: {
     label: string;
     icon: LucideIcon;
@@ -639,7 +667,7 @@ export const Toolbar = () => {
       {
         label: "Remove Formatting",
         icon: RemoveFormattingIcon,
-        onClick: () => editor?.chain().focus().unsetAllMarks().run(),
+        onClick: () => editor?.chain().focus().unsetAllMarks().clearNodes().run(),
       },
     ],
   ];
