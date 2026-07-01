@@ -15,7 +15,6 @@ import { Image } from "@tiptap/extension-image";
 import { Underline } from '@tiptap/extension-underline'
 import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
-import ResizeImage from "tiptap-extension-resize-image";
 import { Link } from "@tiptap/extension-link";
 import { TextAlign } from "@tiptap/extension-text-align";
 import { FontSizeExtension } from "@/extensions/font-size";
@@ -114,7 +113,7 @@ export const Editor = ({ initialContent }: EditorProps) => {
       FontSizeExtension,
       LineHeightExtension.configure({
         types: ["heading", "paragraph"],
-        defaultLineHeight: "normal",
+        defaultLineHeight: "1.15",
       }),
     ],
 
